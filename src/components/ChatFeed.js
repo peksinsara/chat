@@ -4,9 +4,25 @@ import MyMessage from "./MyMessage";
 import TheirMessage from "./TheirMessage";
 
 export default function ChatFeed(props) {
-    const { chats, activeChat, userName, messages } = props;
+  const { chats, activeChat, userName, messages } = props;
 
-    const chat = chats && chats[activeChat];
+  const chat = chats && chats[activeChat];
+
+  const renderReadReceipts = (message, isMyMessage) => {
+    chat.people.map(
+      (person, index) =>
+        person.last_read === message.id && (
+          <div
+            key={`read_$ {index}`}
+            className="read-receipt"
+            style={{
+              float: isMyMessage ? "right" : "left",
+              backgroundImage: `url(${person?.person?.avatar})`,
+            }}
+          />
+        )
+    );
+  };
 
   /*fetch all messages */
   const renderMessages = () => {
@@ -36,11 +52,11 @@ export default function ChatFeed(props) {
               marginLeft: isMyMessage ? "0px" : "68px",
             }}
           ></div>
+          {renderReadReceipts(message, isMyMessage)}
         </div>
       );
     });
   };
-
 
   /*if there is no chat display a message */
   if (!chat) return "Loading...";
@@ -52,13 +68,13 @@ export default function ChatFeed(props) {
         <div className="chat-subtitle">
           {chat.people.map((person) => `${person.person.username}`)}
         </div>
-          </div>
-          {renderMessages}
-          <div style={{ height: '100px' }} />
-          {/*form where users can send messages */}
-          <div className="message-form-container">
-              <MessageForm {...props} chatId={activeChat}/>
-          </div>
+      </div>
+      {renderMessages}
+      <div style={{ height: "100px" }} />
+      {/*form where users can send messages */}
+      <div className="message-form-container">
+        <MessageForm {...props} chatId={activeChat} />
+      </div>
     </div>
   );
 }
